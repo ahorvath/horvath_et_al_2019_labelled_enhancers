@@ -1,0 +1,21 @@
+java -mx1600M -jar /data10/working_groups/horvath_group/bin/ChromHMM/ChromHMM.jar LearnModel SAMPLEDATA_HG18 OUTPUTSAMPLE 10 hg18 
+
+
+
+
+java -mx4000M -jar /data10/working_groups/horvath_group/bin/ChromHMM/ChromHMM.jar BinarizeBam /data10/working_groups/horvath_group/bin/ChromHMM/CHROMSIZES/mm10.txt  ../ML_close_vs_open_openness/bams/ marks_Rad21.tsv BMDM_BinarizeBamDir/ 
+java -mx4000M -jar /data10/working_groups/horvath_group/bin/ChromHMM/ChromHMM.jar BinarizeBam -b 100 /data10/working_groups/horvath_group/bin/ChromHMM/CHROMSIZES/mm10.txt  ../ML_close_vs_open_openness/bams/ marks_Rad21.tsv BMDM_BinarizeBamDir_b100/ 
+
+for i in `seq 5 15`; do
+	echo ${i}
+	java -mx9000M -jar /data10/working_groups/horvath_group/bin/ChromHMM/ChromHMM.jar LearnModel -p 20 BMDM_BinarizeBamDir BMDM_out_k${i} ${i} mm10 
+	java -mx9000M -jar /data10/working_groups/horvath_group/bin/ChromHMM/ChromHMM.jar LearnModel -p 20 BMDM_BinarizeBamDir_b100 BMDM_out_b100_k${i} ${i} mm10 
+done
+
+for i in `seq 1 12`; do 
+	echo ${i}; awk -F"\t" -v E="E${i}" '$4==E'  BMDM_out_k12/BMDM_12_segments.bed > BMDM_out_k12/BMDM_12_segments_E${i}.bed ; 
+done
+
+cat BMDM_out_k12/BMDM_12_segments_E4.bed BMDM_out_k12/BMDM_12_segments_E5.bed BMDM_out_k12/BMDM_12_segments_E9.bed BMDM_out_k12/BMDM_12_segments_E10.bed BMDM_out_k12/BMDM_12_segments_E11.bed BMDM_out_k12/BMDM_12_segments_E12.bed > BMDM_out_k12_E45_E9_E12.bed
+
+cat BMDM_out_k12/BMDM_12_segments_E5.bed BMDM_out_k12/BMDM_12_segments_E9.bed BMDM_out_k12/BMDM_12_segments_E10.bed BMDM_out_k12/BMDM_12_segments_E11.bed BMDM_out_k12/BMDM_12_segments_E12.bed > BMDM_out_k12_E5_E9_E12.bed

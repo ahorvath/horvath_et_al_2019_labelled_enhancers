@@ -1,0 +1,21 @@
+ln -s ../../50M_PU1_v9/peaks_wo_artifacts/mm_BMDM_ATACseq_veh_1_macs_peaks_vs_bl_distal.bed ATAC_0h_distal.bed
+
+ln -s ../../50M_PU1_v9/peaks_wo_artifacts/mm_BMDM_IL4_0h_PU1_CS286_macs_peaks_vs_bl_distal.bed PU1_0h_distal.bed
+ln -s ../../50M_PU1_v9/peaks_wo_artifacts/mm_BMDM_JunB_veh_CS1054_macs_peaks_vs_bl_distal.bed JUNB_0h_distal.bed
+ln -s ../../50M_PU1_v9/peaks_wo_artifacts/mm_BMDM_Irf8_veh_CS1055_macs_peaks_vs_bl_distal.bed IRF8_0h_distal.bed
+ln -s ../../50M_PU1_v9/peaks_wo_artifacts/mm_BMDM_CEBPa_veh_macs_peaks_vs_bl_distal.bed CEBPA_0h_distal.bed
+ln -s ../../50M_PU1_v9/peaks_wo_artifacts/mm_BMDM_RUNX1_veh_macs_peaks_vs_bl_distal.bed RUNX1_0h_distal.bed
+
+for FACTORBED in PU1_0h_distal.bed JUNB_0h_distal.bed IRF8_0h_distal.bed CEBPA_0h_distal.bed RUNX1_0h_distal.bed; do
+	FACTOR=`basename ${FACTORBED} _distal.bed`
+	echo ${FACTOR}
+	intersectBed -wa -u -a ${FACTORBED} -b ATAC_0h_distal.bed > ${FACTOR}_and_ATAC_0h_distal.bed
+	intersectBed -wa -u -b ${FACTORBED} -a ATAC_0h_distal.bed > ATAC_0h_and_${FACTOR}_distal.bed
+	subtractBed -A -a ${FACTORBED} -b ATAC_0h_distal.bed > ${FACTOR}_not_ATAC_0h_distal.bed
+	subtractBed -A -a ATAC_0h_distal.bed -b ${FACTORBED} > ATAC_0h_not_${FACTOR}_distal.bed
+done
+
+cat PU1_0h_distal.bed IRF8_0h_distal.bed JUNB_0h_distal.bed CEBPA_0h_distal.bed RUNX1_0h_distal.bed | sortBed | mergeBed > five_factors_union.bed
+
+
+
